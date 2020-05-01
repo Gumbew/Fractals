@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import pearsonr
 from matplotlib import pyplot as plt
+from mpl_toolkits import mplot3d
 
 
 def show_heat_map(C):
@@ -41,8 +42,17 @@ def build_corr_by_day_range(arr, day_range):
     return plt
 
 
-def build_corry_by_day_range_and_zero(arr, day_range):
-    pass
+def build_3d_graph_6(arr, C_dist):
+    z = [h.get_height() for h in C_dist.patches]
+    print(f"z = {z}")
+    y = np.linspace(1, len(arr[0]), len(z))
+    x = np.linspace(0, 1, len(z))
+    X, Y = np.meshgrid(x, y)
+    Z, _ = np.meshgrid(z, z)
+    fig = plt.figure()
+    ax = plt.axes(projection="3d")
+    surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap="viridis", edgecolor="none")
+    fig.colorbar(surf)
 
 
 if __name__ == "__main__":
@@ -61,13 +71,13 @@ if __name__ == "__main__":
     show_heat_map(C)
     show_heat_map(C_mixed)
 
-    # Show distribution plots
-    sns.distplot(C)
-    sns.distplot(C_mixed)
-    plt.legend(['C', 'C mixed'])
+    # Show distribution plots with graph 6 -> normal matrix first and then the mixed one
+    C_dist = sns.distplot(C)
+    plt.show()
+    build_3d_graph_6(arr, C_dist)
     plt.show()
 
-    build_corr_by_day_range(arr, 5)
-    build_corr_by_day_range(arr_mixed, 5)
-
+    C_mixed_dist = sns.distplot(C_mixed)
+    plt.show()
+    build_3d_graph_6(arr_mixed, C_mixed_dist)
     plt.show()

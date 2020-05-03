@@ -53,21 +53,51 @@ def build_3d_graph_6(arr, C_dist):
     surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap="plasma", edgecolor="none")
     # surf = ax.plot_trisurf(x, y, z, cmap="viridis")
     fig.colorbar(surf)
+    return surf
 
 
-def build_graph_8(C, q):
-    def get_prm_lambda(l):
-        return (q/2*np.pi)*(np.sqrt((lambda_plus-l)*(l - lambda_minus))/l)
+def build_graph_8(arr):
+    def get_prm_lambda(l, q):
+        up_left = lambda_plus-l
+        up_right = l - lambda_minus
+        up_ = (up_left * up_right)
+        up = np.sqrt(up_)
+        down = l
+        left = (q/2*np.pi)
+        right = (up/down)
+        # print(f"UP_LEFT: {up_left}")
+        # print(f"UP_RIGHT: {up_right}")
+        # print(f"UP_: {up_}")
+        # print(f"UP: {up}")
+        # print(f"DOWN: {down}")
+        # print(f"LEFT: {left}")
+        # print(f"RIGHT: {right}")
+        return left * right
 
     eig = np.linalg.eigvals(C)
-    lambda_plus = 1 + (1/q) + 2*np.sqrt(1/q)
-    lambda_minus = 1 + (1/q) - 2*np.sqrt(1/q)
-    print(eig)
-    prm = [get_prm_lambda(l) for l in eig]
+    L = len(arr[0])
+    N = len(arr)
+    R_matrix = np.dot(arr, np.transpose(arr)) / L
+    R_eig = np.linalg.eigvals(R_matrix)
+    # print(R_matrix)
+    print(["%.3f" % r for r in R_eig])
+    Q = L / N
+    # print(Q)
+    lambda_plus = 1 + (1/Q) + 2*np.sqrt(1/Q)
+    lambda_minus = 1 + (1/Q) - 2*np.sqrt(1/Q)
+    print(lambda_plus)
+    print(lambda_minus)
+    # prm = [get_prm_lambda(l, Q) for l in R_matrix if lambda_minus <= l <= lambda_plus]
+    prm = [get_prm_lambda(l, Q) for l in R_eig]
     print(prm)
     sns.distplot(eig)
     sns.distplot(prm)
+    plt.legend(["eigs", "prm"])
     plt.show()
+
+
+def build_graph_10(eig):
+    return sum([x**4 for x in eig])
 
 
 if __name__ == "__main__":
@@ -83,21 +113,23 @@ if __name__ == "__main__":
     C_mixed = build_corr_matrix(arr_mixed)
 
     # Heat maps
-    # show_heat_map(C)
-    # show_heat_map(C_mixed)
+    show_heat_map(C)
+    show_heat_map(C_mixed)
     #
     # # Show distribution plots with graph 6 -> normal matrix first and then the mixed one
     #
     # # dist plot + 3d for usual matrix
-    # C_dist = sns.distplot(C)
-    # plt.show()
-    # build_3d_graph_6(arr, C_dist)
-    # plt.show()
+    C_dist = sns.distplot(C)
+    plt.show()
+    s1 = build_3d_graph_6(arr, C_dist)
+    plt.show()
     #
     # # dist plot + 3d for mixed matrix
-    # C_mixed_dist = sns.distplot(C_mixed)
-    # plt.show()
-    # build_3d_graph_6(arr_mixed, C_mixed_dist)
-    # plt.show()
-    q = len(arr[0]) / len(arr)
-    build_graph_8(C, q)
+    C_mixed_dist = sns.distplot(C_mixed)
+    plt.show()
+    s2 = build_3d_graph_6(arr_mixed, C_mixed_dist)
+    plt.show()
+
+    C_dist = sns.distplot(C)
+    C_mixed_dist = sns.distplot(C_mixed)
+    plt.show()

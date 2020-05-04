@@ -38,12 +38,21 @@ def build_corr_by_day_range(arr, day_range):
 
     plt.xticks(np.arange(1, size, day_range), days[::day_range])
     plt.plot(arr_of_avg)
-    # plt.show()
-    return plt
 
 
-def build_3d_graph_6(arr, C_dist):
-    z = [h.get_height() for h in C_dist.patches]
+def build_3d_graph_6(arr, day_range):
+    # z = [h.get_height() for h in C_dist.patches]
+    z = []
+    arr = np.array(arr)
+
+    for i in range(1, len(arr[0]), day_range):
+
+
+        # C_dist = sns.distplot(build_corr_matrix(arr[0:len(arr)][i:i+day_range]))
+        C_dist = sns.distplot(build_corr_matrix(arr[:, i:i + day_range]))
+
+        z_part = [h.get_height() for h in C_dist.patches]
+        z.extend(z_part)
     y = list(np.linspace(1, len(arr[0]), len(z)))
     x = list(np.linspace(0, 1, len(z)))
     X, Y = np.meshgrid(x, y)
@@ -58,13 +67,13 @@ def build_3d_graph_6(arr, C_dist):
 
 def build_graph_8(arr):
     def get_prm_lambda(l, q):
-        up_left = lambda_plus-l
+        up_left = lambda_plus - l
         up_right = l - lambda_minus
         up_ = (up_left * up_right)
         up = np.sqrt(up_)
         down = l
-        left = (q/2*np.pi)
-        right = (up/down)
+        left = (q / 2 * np.pi)
+        right = (up / down)
         # print(f"UP_LEFT: {up_left}")
         # print(f"UP_RIGHT: {up_right}")
         # print(f"UP_: {up_}")
@@ -83,8 +92,8 @@ def build_graph_8(arr):
     print(["%.3f" % r for r in R_eig])
     Q = L / N
     # print(Q)
-    lambda_plus = 1 + (1/Q) + 2*np.sqrt(1/Q)
-    lambda_minus = 1 + (1/Q) - 2*np.sqrt(1/Q)
+    lambda_plus = 1 + (1 / Q) + 2 * np.sqrt(1 / Q)
+    lambda_minus = 1 + (1 / Q) - 2 * np.sqrt(1 / Q)
     print(lambda_plus)
     print(lambda_minus)
     # prm = [get_prm_lambda(l, Q) for l in R_matrix if lambda_minus <= l <= lambda_plus]
@@ -97,7 +106,7 @@ def build_graph_8(arr):
 
 
 def build_graph_10(eig):
-    return sum([x**4 for x in eig])
+    return sum([x ** 4 for x in eig])
 
 
 if __name__ == "__main__":
@@ -121,15 +130,20 @@ if __name__ == "__main__":
     # # dist plot + 3d for usual matrix
     C_dist = sns.distplot(C)
     plt.show()
-    s1 = build_3d_graph_6(arr, C_dist)
+    s1 = build_3d_graph_6(arr, 5)
     plt.show()
     #
     # # dist plot + 3d for mixed matrix
-    C_mixed_dist = sns.distplot(C_mixed)
+    C_mixed_dist = sns.distplot(C_mixed, color="orange")
     plt.show()
-    s2 = build_3d_graph_6(arr_mixed, C_mixed_dist)
+    s2 = build_3d_graph_6(arr_mixed, 5)
     plt.show()
 
     C_dist = sns.distplot(C)
     C_mixed_dist = sns.distplot(C_mixed)
+    plt.legend(["вихідна матриця", "перемішана матриця"])
+    plt.show()
+    build_corr_by_day_range(arr, 5)
+    build_corr_by_day_range(arr_mixed, 5)
+    plt.legend(["вихідна матриця", "перемішана матриця"])
     plt.show()
